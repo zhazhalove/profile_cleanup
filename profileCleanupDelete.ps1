@@ -152,6 +152,9 @@ $deleteButton.Add_Click({
                 if ($profileToDelete) {
                     $profileToDelete.Delete()
                     [System.Windows.Forms.MessageBox]::Show("$($userName) has been deleted.", "Success", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+
+                    # Remove the selected row from DataGridView
+                    $dataGridView.Rows.Remove($dataGridView.SelectedRows[0])
                 } else {
                     [System.Windows.Forms.MessageBox]::Show("Profile not found.", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
                 }
@@ -160,7 +163,7 @@ $deleteButton.Add_Click({
                 # Re-enable the buttons
                 $deleteButton.Enabled = $true
                 $loadButton.Enabled = $true
-                $loadButton.PerformClick() # Reload profiles
+                # $loadButton.PerformClick() # Reload profiles
             }
         }
     }

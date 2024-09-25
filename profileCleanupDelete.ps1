@@ -70,7 +70,8 @@ $progressBar.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.W
 $progressBar.Minimum = 0
 $form.Controls.Add($progressBar)
 
-# Event handler for the Load Profiles button click
+
+
 $loadButton.Add_Click({
     $dataGridView.DataSource = $null   # Clear existing data
     $deleteButton.Enabled = $false     # Disable delete button
@@ -106,10 +107,13 @@ $loadButton.Add_Click({
         })
     }
 
+    # Sort the profile data by ProfileSizeMB in descending order
+    $sortedProfileData = $profileData | Sort-Object -Property {[double]$_.ProfileSizeMB} -Descending
+
     # Update the DataGridView using the UI thread
     $form.Invoke([Action]{
         $bindingList = [System.ComponentModel.BindingList[object]]::new()
-        $profileData | ForEach-Object { $bindingList.Add($_) }
+        $sortedProfileData | ForEach-Object { $bindingList.Add($_) }
         $dataGridView.DataSource = $bindingList
         $dataGridView.AutoResizeColumns()
         $dataGridView.Refresh()
@@ -120,6 +124,7 @@ $loadButton.Add_Click({
         $progressBar.Value = 0
     })
 })
+
 
 # Enable the Delete button when a row is selected
 $dataGridView.add_SelectionChanged({

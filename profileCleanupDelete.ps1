@@ -93,8 +93,17 @@ $loadButton.Add_Click({
 
     foreach ($userProfile in $userProfiles) {
         $profileSize = Get-AccurateDirectorySize -Path $userProfile.LocalPath
+
+        try {
+            $userName = (New-Object System.Security.Principal.SecurityIdentifier($userProfile.SID)).Translate([System.Security.Principal.NTAccount]).ToString()
+        } catch {
+            Write-Verbose "Invalid or missing SID: $($userProfile.SID)"
+            $userName = "unknown_SID"
+        }
+        
+
         $profileData += [PSCustomObject]@{
-            UserName     = (New-Object System.Security.Principal.SecurityIdentifier($userProfile.SID)).Translate([System.Security.Principal.NTAccount]).ToString()
+            UserName     = $userName
             LocalPath    = $userProfile.LocalPath
             LastUseTime  = [Management.ManagementDateTimeConverter]::ToDateTime($userProfile.LastUseTime).ToString()
             ProfileSizeMB = [math]::Round($profileSize / 1MB, 2).ToString("N2") # Convert to a string with 2 decimal places

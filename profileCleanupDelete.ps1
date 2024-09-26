@@ -77,7 +77,7 @@ $loadButton.Add_Click({
     $deleteButton.Enabled = $false     # Disable delete button
 
     # Retrieve user profiles using WMI
-    $profiles = Get-WmiObject -Class Win32_UserProfile | Where-Object {
+    $userProfiles = Get-WmiObject -Class Win32_UserProfile | Where-Object {
         -not $_.Special -and
         $_.LocalPath -like "C:\Users\*" -and
         $_.SID -match "^S-1-5-21-" -and
@@ -85,20 +85,20 @@ $loadButton.Add_Click({
     }
 
     # Set the progress bar maximum value
-    $progressBar.Maximum = $profiles.Count
+    $progressBar.Maximum = $userProfiles.Count
     $progressBar.Value = 0
 
     # Prepare data for the DataGridView
     $profileData = @()
 
-    foreach ($profile in $profiles) {
-        $profileSize = Get-AccurateDirectorySize -Path $profile.LocalPath
+    foreach ($userProfile in $userProfiles) {
+        $profileSize = Get-AccurateDirectorySize -Path $userProfile.LocalPath
         $profileData += [PSCustomObject]@{
-            UserName     = (New-Object System.Security.Principal.SecurityIdentifier($profile.SID)).Translate([System.Security.Principal.NTAccount]).ToString()
-            LocalPath    = $profile.LocalPath
-            LastUseTime  = [Management.ManagementDateTimeConverter]::ToDateTime($profile.LastUseTime).ToString()
+            UserName     = (New-Object System.Security.Principal.SecurityIdentifier($userProfile.SID)).Translate([System.Security.Principal.NTAccount]).ToString()
+            LocalPath    = $userProfile.LocalPath
+            LastUseTime  = [Management.ManagementDateTimeConverter]::ToDateTime($userProfile.LastUseTime).ToString()
             ProfileSizeMB = [math]::Round($profileSize / 1MB, 2).ToString("N2") # Convert to a string with 2 decimal places
-            SID          = $profile.SID # Store the SID for deletion
+            SID          = $userProfile.SID # Store the SID for deletion
         }
 
         # Update the progress bar
